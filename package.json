@@ -9,15 +9,12 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:lemlib.helloWorld"
-  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "lemlib.helloWorld",
-        "title": "Hello World"
+        "command": "lemlib.install",
+        "title": "Install LemLib"
       }
     ]
   },
