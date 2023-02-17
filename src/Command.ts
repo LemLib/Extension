@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
 
 /**
  * Represents a LemLib command.
@@ -18,7 +19,7 @@ export default abstract class Command {
      * 
      * @type {string}
     */
-    public static readonly commandNamespace = 'lemlib.';
+    public static readonly commandNamespace: string = 'lemlib.';
 
     /**
      * The callback function that is ran when the command is called.
@@ -48,6 +49,33 @@ export async function registerCommand(command: Command): Promise<boolean> {
     if ((await vscode.commands.getCommands()).includes(commandName)) return false;
 
     vscode.commands.registerCommand(commandName, command.execute);
+
+    return true;
+}
+
+/**
+ * @returns true if the current workspace is a PROS project, false otherwise
+ */
+export function isProsProject(): boolean {
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+
+	if (!workspaceFolders) return false;
+
+	for (const folder of workspaceFolders) {
+		const files = fs.readdirSync(folder.uri.fsPath);
+
+		for (const file of files) if (file === 'project.pros') return true;
+	}
+
+	return false;
+}
+
+export function checkIfPros(): boolean {
+    if (!isProsProject()) {
+        vscode.window.showErrorMessage('This command can only be ran inside of a PROS project.');
+
+        return false;
+    }
 
     return true;
 }
