@@ -14,7 +14,13 @@
     "commands": [
       {
         "command": "lemlib.install",
-        "title": "Install LemLib"
+        "title": "Install LemLib",
+        "category": "LemLib"
+      },
+      {
+        "command": "lemlib.uninstall",
+        "title": "Uninstall LemLib",
+        "category": "LemLib"
       }
     ]
   },

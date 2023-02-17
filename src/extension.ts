@@ -5,6 +5,7 @@ import axios from 'axios';
 import InstallCommand from './commands/InstallCommand';
 
 import { registerCommand } from './Command';
+import UninstallCommand from './commands/UninstallCommand';
 
 export async function getLatestGithubVersion(): Promise<string> {
 	const response = await axios.get('https://api.github.com/repos/LemLib/LemLib/releases/latest');
@@ -32,6 +33,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	console.log('LemLib enabled');
 
 	await registerCommand(new InstallCommand());
+	await registerCommand(new UninstallCommand());
 }
 
 export function deactivate() {}

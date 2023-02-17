@@ -10,7 +10,7 @@ export function getProsTerminal(): vscode.Terminal | null {
     return null;
 }
 
-export function execute(command: string, ...args: string[]): void {
+export async function execute(command: string, ...args: string[]): Promise<void> {
     const terminal: vscode.Terminal | null = getProsTerminal();
 
     if (terminal === null) return;
