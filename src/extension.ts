@@ -2,10 +2,13 @@ import * as vscode from 'vscode';
 
 import axios from 'axios';
 
+import { registerCommand } from './Command';
+
+import PathGeneratorCommand from './commands/PathGeneratorCommand';
+import UninstallCommand from './commands/UninstallCommand';
 import InstallCommand from './commands/InstallCommand';
 
-import { registerCommand } from './Command';
-import UninstallCommand from './commands/UninstallCommand';
+let extensionUri: vscode.Uri | null = null;
 
 export async function getLatestGithubVersion(): Promise<string> {
 	const response = await axios.get('https://api.github.com/repos/LemLib/LemLib/releases/latest');
@@ -32,8 +35,15 @@ export async function getLatestVerisonZipUrl(): Promise<string> {
 export async function activate(context: vscode.ExtensionContext) {	
 	console.log('LemLib enabled');
 
-	await registerCommand(new InstallCommand());
+	extensionUri = context.extensionUri;
+
+	await registerCommand(new PathGeneratorCommand());
 	await registerCommand(new UninstallCommand());
+	await registerCommand(new InstallCommand());
 }
 
 export function deactivate() {}
+
+export function getExtensionUri() {
+	return extensionUri;
+}

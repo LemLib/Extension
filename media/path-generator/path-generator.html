@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Path Generator</title>
+        <link rel="icon" type="image" href="/images/icon.png">
+        <link rel="stylesheet" href="path-generator.css">
+    </head>
+
+    <body oncontextmenu="return false;">
+        <div>
+            <canvas id="fieldCanvas" class="fieldCanvas" width="693" height="693"></canvas>
+        </div>
+
+        <div class="sliderContainer">
+
+            <input type="range" value="20" min="0" max="200" step="0.01" oninput="this.nextElementSibling.value = this.value" id="decelerationSlider">
+            <output class="text" id="decelVal">20</output>
+            <label for="decelerationSlider" class="text">Max Deceleration</label>
+
+            <input type="range" value="62.83" min="0" max="200" step="0.01" oninput="this.nextElementSibling.value = this.value" id="maxSpeedSlider">
+            <output class="text" id="maxSpeedVal">62.83</output>
+            <label for="maxSpeedSlider" class="text">Max Speed</label>
+
+            <input type="range" value="50" min="0.1" max="200" step="0.01" oninput="this.nextElementSibling.value = this.value" id="multiplierSlider">
+            <output class="text" id="multiplierVal">50</output>
+            <label for="multiplierSlider" class="text">Turn Multiplier</label>
+            
+            <button type="button" id="downloadPathBtn">Download Path Data</button>
+            <input type="file" id="uploadPathBtn"></input>
+            <label for="uploadPathBtn" id="uploadPathLabel">Upload Path Data</label>
+        </div>
+
+        <div class="modeContainer">
+            <button type="button" id="modeBtn">mode</button>
+        </div>
+
+        <div class="debugContainer">
+            <input type="file" id="uploadDebugBtn"></input>
+            <label for="uploadDebugBtn" id="uploadDebugLabel">Upload Robot Debug Data</label>
+            <button type="button" id="debugBackBtn">&#x23EE;</button>
+            <button type="button" id="debugPauseBtn">&#x23EF;</button>
+            <button type="button" id="debugForwardBtn">&#x23ED;</button>
+            <input type="range" value ="0" min="0" max="100" step="1" oninput="this.nextElementSibling.value = this.value" id="timeSlider">
+        </div>
+
+        <div class="graph" id="graphContainer">
+            <canvas id="leftMotorCanvas"></canvas>
+            <canvas id="rightMotorCanvas"></canvas>
+        </div>
+        <script>
+            /**
+             * Global objects
+             */
+            const decelerationSlider = document.getElementById('decelerationSlider');
+            const maxSpeedSlider = document.getElementById('maxSpeedSlider');
+            const multiplierSlider = document.getElementById('multiplierSlider');
+
+            const decelerationText = document.getElementById('decelVal');
+            const maxSpeedText = document.getElementById('maxSpeedVal');
+            const multiplierText = document.getElementById('multiplierVal');
+
+            let mode = 0; // 0: create; 1: debug
+            let path;
+            let highlightList = [];
+            let highlightCircles = [];
+
+
+            /**
+             * Path settings
+             */
+            const spacing = 2; // target inches between points
+
+            /**
+             * Graphics settings
+             */
+            const imgTrueWidth = 147.8377757; // the width of the image in inches
+            const img = new Image; // background image
+            img.src = 'images/field.png'; // get the image from the script tag
+
+            const fps = 60; // how many frames to render each second
+
+            /**
+             * Accessibility settings
+             */
+            const pointRadius = 1;
+            const pointBorderWidth = 0;
+            const lineWidth = 1;
+            const controlPointColor = 'rgba(50, 161, 68, 0.452)';
+            const controlPointRadius = 5;
+            const controlPointBorderColor = 'rgba(50, 161, 68, 0.452)';
+            const controlPointBorderWidth = 0;
+            const controlLineWidth = 0.5;
+            const controlLineColor = 'black';
+        </script>
+        <script src="scripts/vector.js"></script>
+        <script src="scripts/graphics.js"></script>
+        <script src="scripts/path.js"></script>
+        <script src="scripts/events.js"></script>
+        <script src="scripts/main.js"></script>
+    </body>
+</html>

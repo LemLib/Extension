@@ -1,0 +1,92 @@
+.fieldCanvas {
+    border:1px solid hwb(0 0% 100%);
+    float: left;
+}
+
+
+/**
+ * This css is used to style the sliders when in create mode
+ */
+.sliderContainer {
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 0;
+    padding-top: 49px;
+}
+  
+.sliderContainer input {
+    list-style: none;
+    flex-basis: 40%;
+    color: white;
+}
+
+.sliderContainer output {
+    list-style: none;
+    flex-basis: 10%;
+    color: white;
+}
+
+.sliderContainer label {
+    list-style: none;
+    flex-basis: 40%;
+    color: white;
+}
+
+.sliderContainer button {
+    list-style: none;
+    flex-basis: 100%;
+    color: black;
+}
+
+
+/**
+ * This css is used to style the sliders when in debug mode
+ */
+.debugContainer {
+    display: none;
+    flex-wrap: wrap;
+    padding-left: 0;
+    padding-top: 49px;
+}
+
+.debugContainer input {
+    list-style: none;
+    flex-basis: 100%;
+    color: white;
+}
+
+.debugContainer output {
+    list-style: none;
+    flex-basis: 10%;
+    color: white;
+}
+
+.debugContainer label {
+    list-style: none;
+    flex-basis: 40%;
+    color: white;
+}
+
+.debugContainer button {
+    list-style: none;
+    flex-basis: 10%;
+    width:50px;
+    height:50px;
+    font-size:30px;
+    color: black;
+}
+
+
+.graph {
+    display: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: 25px;
+    gap: 25px 25px;
+}
+
+.graph canvas {
+    width: 60%;
+    height: 35%;
+    border: 1px solid hwb(0 0% 100%);
+}

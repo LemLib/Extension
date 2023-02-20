@@ -21,6 +21,11 @@
         "command": "lemlib.uninstall",
         "title": "Uninstall LemLib",
         "category": "LemLib"
+      },
+      {
+        "command": "lemlib.pathgenerator",
+        "title": "Open Path Generator",
+        "category": "LemLib"
       }
     ]
   },
