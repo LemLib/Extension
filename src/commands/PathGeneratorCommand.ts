@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 import Command from '../Command';
 
-import { PathGeneratorPanel } from '../pathGenerator';
+import { PathGeneratorPanel } from '../modules/path-gen/pathGenerator';
 import { getExtensionUri } from '../extension';
 
 /**
