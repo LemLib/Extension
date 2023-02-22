@@ -4,10 +4,12 @@ import axios from 'axios';
 
 import { registerCommand } from './Command';
 
+import CodeGeneratorCommand from './commands/CodeGeneratorCommand';
 import PathGeneratorCommand from './commands/PathGeneratorCommand';
+import CodeGenerator from './modules/gui-setup/codeGenerator';
 import UninstallCommand from './commands/UninstallCommand';
 import InstallCommand from './commands/InstallCommand';
-import CodeGenerator from './modules/gui-setup/codeGenerator';
+
 import * as types from './modules/gui-setup/types';
 
 let extensionUri: vscode.Uri | null = null;
@@ -39,6 +41,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	extensionUri = context.extensionUri;
 
+	await registerCommand(new CodeGeneratorCommand());
 	await registerCommand(new PathGeneratorCommand());
 	await registerCommand(new UninstallCommand());
 	await registerCommand(new InstallCommand());

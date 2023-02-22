@@ -26,6 +26,11 @@
         "command": "lemlib.pathgenerator",
         "title": "Open Path Generator",
         "category": "LemLib"
+      },
+      {
+        "command": "lemlib.codegenerator",
+        "title": "Open Code Generator",
+        "category": "LemLib"
       }
     ]
   },
