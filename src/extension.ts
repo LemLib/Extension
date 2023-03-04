@@ -9,6 +9,7 @@ import PathGeneratorCommand from './commands/PathGeneratorCommand';
 import CodeGenerator from './modules/gui-setup/codeGenerator';
 import UninstallCommand from './commands/UninstallCommand';
 import InstallCommand from './commands/InstallCommand';
+import TestCommand from './commands/TestCommand';
 
 import * as types from './modules/gui-setup/types';
 
@@ -45,6 +46,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	await registerCommand(new PathGeneratorCommand());
 	await registerCommand(new UninstallCommand());
 	await registerCommand(new InstallCommand());
+	await registerCommand(new TestCommand());
 
 	// for testing
 	new CodeGenerator({
