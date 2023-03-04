@@ -324,6 +324,10 @@ export async function createProjectPros(path: string, progress: vscode.Progress<
     await new Promise((resolve) => writer.on('finish', resolve));
 }
 
+function showInformationMessage(message: string, automatic: boolean): void {
+    if (!automatic) vscode.window.showInformationMessage(message);
+}
+
 export async function isLatestDownloaded(): Promise<boolean> {
     const path: string = vscode.workspace.workspaceFolders?.[0].uri.fsPath as string + '/.vscode/.lemlib/filesystem-manager/bin';
     
@@ -336,7 +340,7 @@ export async function isLatestDownloaded(): Promise<boolean> {
     return installedVersions.includes(latest);
 }
 
-export async function download(): Promise<boolean> {
+export async function download(automatic: boolean = false): Promise<boolean> {
     const path: string = vscode.workspace.workspaceFolders?.[0].uri.fsPath as string + '/.vscode/.lemlib/filesystem-manager/bin';
     
     if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
@@ -347,22 +351,27 @@ export async function download(): Promise<boolean> {
     const latest: string = await getLatestVersion();
     
     if (installedVersions.includes(latest)) {
-        vscode.window.showInformationMessage('Latest version is already installed!');
+        showInformationMessage('Latest version is already installed!', automatic);
         return false;
     }
+
+    let version: string = 'Latest';
     
-    const versionsQuickPick: vscode.QuickPickItem[] = versions.map((version) => {
-        return {
-            label: version === latest ? 'Latest' : version,
-            description: version === latest ? 'Recommended' : undefined
-        };
-    });
-    
-    const version: string | undefined = await vscode.window.showQuickPick(versionsQuickPick, {
-        placeHolder: 'Select a version to download'
-    }).then((item) => item?.label);
-    
-    if (!version) return false;
+    if (!automatic) {
+        const versionsQuickPick: vscode.QuickPickItem[] = versions.map((version) => {
+            return {
+                label: version === latest ? 'Latest' : version,
+                description: version === latest ? 'Recommended' : undefined
+            };
+        });
+        
+        const res: string | undefined = await vscode.window.showQuickPick(versionsQuickPick, {
+            placeHolder: 'Select a version to download'
+        }).then((item) => item?.label);
+
+        if (res === undefined) return false;
+        else version === res;
+    };
 
     const progress = vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
@@ -392,18 +401,18 @@ export async function uploadProject(path: string, progress: vscode.Progress<{ me
 
     progress.report({ message: 'Cleaning up' });
 
-    execute('cd ../../');
+    execute('cd ../../../');
 
     progress.report({ message: 'Successfully uploaded project' });
     vscode.window.showInformationMessage('Successfully uploaded project');
 }
 
-export default async function upload(): Promise<void> {
+export default async function upload(automatic: boolean = false): Promise<void> {
     const isLatest: boolean = await isLatestDownloaded();
 
-    let uploaded: boolean = false;
+    let uploaded: boolean = true;
 
-    if (!isLatest) uploaded = await download();
+    if (!isLatest) uploaded = await download(automatic);
 
     if (!uploaded) return;
 
