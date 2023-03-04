@@ -325,7 +325,7 @@ export async function createProjectPros(path: string, progress: vscode.Progress<
 }
 
 export async function isLatestDownloaded(): Promise<boolean> {
-    const path: string = vscode.workspace.workspaceFolders?.[0].uri.fsPath as string + '/.lemlib/filesystem-manager/bin';
+    const path: string = vscode.workspace.workspaceFolders?.[0].uri.fsPath as string + '/.vscode/.lemlib/filesystem-manager/bin';
     
     if (!fs.existsSync(path)) return false;
 
@@ -336,8 +336,8 @@ export async function isLatestDownloaded(): Promise<boolean> {
     return installedVersions.includes(latest);
 }
 
-export async function download(): Promise<void> {
-    const path: string = vscode.workspace.workspaceFolders?.[0].uri.fsPath as string + '/.lemlib/filesystem-manager/bin';
+export async function download(): Promise<boolean> {
+    const path: string = vscode.workspace.workspaceFolders?.[0].uri.fsPath as string + '/.vscode/.lemlib/filesystem-manager/bin';
     
     if (!fs.existsSync(path)) fs.mkdirSync(path, { recursive: true });
     
@@ -348,7 +348,7 @@ export async function download(): Promise<void> {
     
     if (installedVersions.includes(latest)) {
         vscode.window.showInformationMessage('Latest version is already installed!');
-        return;
+        return false;
     }
     
     const versionsQuickPick: vscode.QuickPickItem[] = versions.map((version) => {
@@ -362,7 +362,7 @@ export async function download(): Promise<void> {
         placeHolder: 'Select a version to download'
     }).then((item) => item?.label);
     
-    if (!version) return;
+    if (!version) return false;
 
     const progress = vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
@@ -377,12 +377,43 @@ export async function download(): Promise<void> {
             vscode.window.showErrorMessage('Failed to download all assets for v' + version === 'Latest' ? latest : version + '! [' + result.downloaded + '/' + result.total + ']');
         }
     });
+
+    return await new Promise((resolve) => progress.then(() => resolve(true)));
+}
+
+export async function uploadProject(path: string, progress: vscode.Progress<{ message?: string; increment?: number; }>): Promise<void> {
+    progress.report({ message: 'Entering project directory' });
+
+    execute('cd ' + path);
+
+    progress.report({ message: 'Uploading project' });
+
+    execute('pros upload --slot 8');
+
+    progress.report({ message: 'Cleaning up' });
+
+    execute('cd ../../');
+
+    progress.report({ message: 'Successfully uploaded project' });
+    vscode.window.showInformationMessage('Successfully uploaded project');
 }
 
 export default async function upload(): Promise<void> {
     const isLatest: boolean = await isLatestDownloaded();
 
-    if (!isLatest) await download();
+    let uploaded: boolean = false;
 
+    if (!isLatest) uploaded = await download();
 
+    if (!uploaded) return;
+
+    const path: string = vscode.workspace.workspaceFolders?.[0].uri.fsPath as string + '/.vscode/.lemlib/filesystem-manager';
+
+    vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: 'Uploading project to V5',
+        cancellable: false
+    }, async (progress) => {
+        return await uploadProject(path, progress);
+    });
 }

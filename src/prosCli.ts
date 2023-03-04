@@ -10,10 +10,24 @@ export function getProsTerminal(): vscode.Terminal | null {
     return null;
 }
 
-export async function execute(command: string, ...args: string[]): Promise<void> {
+export async function execute(command: string, ...args: string[]): Promise<boolean> {
     const terminal: vscode.Terminal | null = getProsTerminal();
 
-    if (terminal === null) return;
+    if (terminal === null) return false;
 
     terminal.sendText(command + ' ' + args.join(' '));
+
+    return await new Promise(rs => {
+        const check = 'PS C:';
+
+        const interval = setInterval(() => {
+            const text = terminal?.name;
+
+            if (text?.startsWith(check)) {
+                clearInterval(interval);
+
+                rs(true);
+            }
+        }, 100);
+    });
 }
