@@ -20,7 +20,7 @@ export default class UninstallCommand extends Command {
 
             // wait for the pros command to finish
             new Promise(resolve => {
-                execute('pros', 'c', 'uninstall', 'LemLib');
+                execute('pros', (data: string, stdin: any) => {}, 'c', 'uninstall', 'LemLib');
             }).then(() => vscode.window.showInformationMessage('Successfully uninstalled LemLib.'));
         });
     }

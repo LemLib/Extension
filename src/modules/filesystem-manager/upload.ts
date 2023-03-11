@@ -4,7 +4,7 @@ import * as fs from 'fs';
 
 import axios from 'axios';
 
-import { execute } from '../../prosCli';
+import * as cli from '../../prosCli';
 
 export async function getAllVersions(): Promise<string[]> {
     const URL = 'https://api.github.com/repos/lemlib/filesystem-manager/releases';
@@ -391,20 +391,93 @@ export async function download(automatic: boolean = false): Promise<boolean> {
 }
 
 export async function uploadProject(path: string, progress: vscode.Progress<{ message?: string; increment?: number; }>): Promise<void> {
+    progress.report({ message: 'Finding open program slots' });
+
+    const slots: number[] = await findOpenProgramSlots();
+
+    let slot: any = slots[0];
+
+    if (slots.length === 0) {
+        slot = await vscode.window.showQuickPick([1,2,3,4,5,6,7,8].map((slot) => {
+            return {
+                label: slot.toString(),
+                description: 'Program slot ' + slot
+            };
+        }), {
+            placeHolder: 'There are no open program slots. Select a slot to upload to.'
+        }).then((item) => item?.label);
+    }
+
+    const selectedSlot: number = parseInt(slot);
+
     progress.report({ message: 'Entering project directory' });
 
-    execute('cd ' + path);
+    cli.execute('cd ', (data: string, stdin: any) => {}, path);
 
-    progress.report({ message: 'Uploading project' });
+    progress.report({ message: 'Uploading project to slot ' + selectedSlot });
 
-    execute('pros upload --slot 8');
+    cli.execute('pros', (data: string, stdin: any) => {}, 'upload', '--project ' + path, '--slot', selectedSlot.toString());
 
     progress.report({ message: 'Cleaning up' });
 
-    execute('cd ../../../');
+    cli.execute('cd ', (data: string, stdin: any) => {}, '../../../');
 
     progress.report({ message: 'Successfully uploaded project' });
-    vscode.window.showInformationMessage('Successfully uploaded project');
+    vscode.window.showInformationMessage('Successfully uploaded project to slot ' + selectedSlot);
+
+    setLastUploadedPort(selectedSlot);
+}
+
+export async function findOpenProgramSlots(): Promise<number[]> {
+    const output: string[] = await cli.execute('pros', (data: string, stdin: any) => {}, 'v5', 'ls-files');
+
+    let json: string = '[' + output[0].split('}').filter((line) => line !== '').join('},') + ']';
+    json = json.substring(0, json.length - 4) + ']';
+    json = json.replace(/datetime\.datetime\((\d+), (\d+), (\d+), (\d+), (\d+), (\d+)\)/g, '"datetime.datetime($1, $2, $3, $4, $5, $6)"'); 
+    json = '{"files": ' + json + '}';
+    json = json.replace(/'/g, '"');
+
+    const jsonObj = JSON.parse(json);
+
+    const takenSlots: number[] = [];
+
+    for (let i = 0; i < jsonObj.files.length; i++) {
+        const obj = jsonObj.files[i];
+
+        if (obj.type === 'ini') {
+            const name = obj.filename.split('.')[0].replace('slot_', '');
+
+            takenSlots.push(parseInt(name));
+        }
+    }
+
+    const slots: number[] = [];
+
+    for (let i = 1; i <= 8; i++) {
+        if (!takenSlots.includes(i)) slots.push(i);
+    }
+
+    return slots;
+}
+
+export function setLastUploadedPort(port: number): void {
+    const path = vscode.workspace.workspaceFolders?.[0].uri.fsPath as string + '/.vscode/.lemlib/fs-manager.json';
+
+    const info = JSON.parse(fs.readFileSync(path, 'utf8'));
+
+    info.lastUploadedPort = port;
+
+    fs.writeFileSync(path, JSON.stringify(info, null, 4));
+}
+
+export function getLastUploadedPort(): number {
+    const path = vscode.workspace.workspaceFolders?.[0].uri.fsPath as string + '/.vscode/.lemlib/fs-manager.json';
+
+    if (!fs.existsSync(path)) return 0;
+
+    const info = JSON.parse(fs.readFileSync(path, 'utf8'));
+
+    return info.lastUploadedPort;
 }
 
 export default async function upload(automatic: boolean = false): Promise<void> {

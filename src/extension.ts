@@ -13,6 +13,8 @@ import TestCommand from './commands/TestCommand';
 
 import * as types from './modules/gui-setup/types';
 
+import * as sd from './modules/filesystem-manager/sd';
+
 let extensionUri: vscode.Uri | null = null;
 
 export async function getLatestGithubVersion(): Promise<string> {
@@ -37,8 +39,10 @@ export async function getLatestVerisonZipUrl(): Promise<string> {
 	return assets[0].browser_download_url;
 }
 
-export async function activate(context: vscode.ExtensionContext) {	
+export async function activate(context: vscode.ExtensionContext) {
 	console.log('LemLib enabled');
+
+	sd.write('lemlib.txt', ['this is a test', 'file, written to the V5', 'brain via the LemLib', 'filesystem manager & the', 'LemLib extension.']);
 
 	extensionUri = context.extensionUri;
 
@@ -48,7 +52,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	await registerCommand(new InstallCommand());
 	await registerCommand(new TestCommand());
 
-	// for testing
 	new CodeGenerator({
 		code: {
 			header: 'main.h',

@@ -72,11 +72,11 @@ async function installLemLib(progress: vscode.Progress<{ message?: string; incre
 
     progress.report({ message: 'Fetching ' + toDownload + '...' });
 
-    execute('pros c fetch ' + toDownload);
+    execute('pros', (data: string, stdin: any) => {}, 'c', 'fetch', toDownload);
 
     progress.report({ message: 'Applying ' + toDownload + '...' });
 
-    execute('pros c apply ' + toDownload.replace('.zip', ''));
+    execute('pros', (data: string, stdin: any) => {}, 'c', 'apply', toDownload.replace('.zip', ''));
     
     progress.report({ message: 'Cleaning up...' });
 
